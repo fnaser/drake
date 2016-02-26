@@ -28,13 +28,9 @@ if (LCM_FOUND)
 endif()
 
 # If ROS is installed on the local system, include support for it.
-if(DEFINED ENV{ROS_ROOT})
-  find_package(roscpp REQUIRED)
+if(roscpp_FOUND)
   find_package(std_msgs REQUIRED)
-
-  include_directories(${roscpp_INCLUDE_DIRS})
   include_directories(${std_msgs_INCLUDE_DIRS})
-
   add_executable(runPendulumDynamicsROS runDynamicsROS.cpp)
   target_link_libraries(runPendulumDynamicsROS drakeRBM ${roscpp_LIBRARIES} ${std_msgs_LIBRARIES})
   # add_test(NAME runPendulumDynamicsROS COMMAND runPendulumDynamicsROS WORKING_DIRECTORY ${PROJECT_SOURCE_DIR}/examples/Pendulum)

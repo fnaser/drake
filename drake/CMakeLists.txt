@@ -187,6 +187,15 @@ if (LCM_FOUND)
 
 endif()
 
+# Conditionally add ROS support of it exists on the local machine.
+find_package(roscpp QUIET)
+if(NOT roscpp_FOUND)
+  message(STATUS "Couldn't find roscpp so not building ROS-specific functionality. Did you source the ROS setup.sh file?")
+else()
+  message(STATUS "Found roscpp installed at ${roscpp_DIR}, so building ROS-specific functionality.")
+  include_directories(${roscpp_INCLUDE_DIRS})
+endif()
+
 add_jar(drake SOURCES ${drake_jar_javafiles})
 install_jar(drake share/java)
 pods_install_pkg_config_file(drake-java

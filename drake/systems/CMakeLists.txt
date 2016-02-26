@@ -13,7 +13,7 @@ if (LCM_FOUND)
 endif()
 
 # If ROS is installed on the local system, include support for it.
-if(DEFINED ENV{ROS_ROOT})
+if(roscpp_FOUND)
 
   # add_library_with_exports(LIB_NAME drakeROSSystem SOURCE_FILES ROSSystem.cpp)
   # add_dependencies(drakeROSSystem drake_lcmtypes lcmtype_agg_hpp)
