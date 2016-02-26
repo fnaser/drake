@@ -187,7 +187,8 @@ if (LCM_FOUND)
 
 endif()
 
-# Conditionally add ROS support of it exists on the local machine.
+# Add support for ROS if it exists exists on the local machine.
+# Drake determines if ROS exists based on whether cmake can find package roscpp.
 find_package(roscpp QUIET)
 if(NOT roscpp_FOUND)
   message(STATUS "Couldn't find roscpp so not building ROS-specific functionality. Did you source the ROS setup.sh file?")
@@ -230,6 +231,7 @@ add_subdirectory(thirdParty/spruce)
 add_subdirectory(thirdParty/tinyxml2)
 add_subdirectory(examples)
 add_subdirectory(bindings)
+add_subdirectory(rostypes)
 
 # setup matlab pods-compliance
 include(cmake/matlab_pods.cmake)

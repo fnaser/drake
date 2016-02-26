@@ -30,8 +30,10 @@ endif()
 # If ROS is installed on the local system, include support for it.
 if(roscpp_FOUND)
   find_package(std_msgs REQUIRED)
-  include_directories(${std_msgs_INCLUDE_DIRS})
+  include_directories(${std_msgs_INCLUDE_DIRS} ${CMAKE_BINARY_DIR}/devel/include)
   add_executable(runPendulumDynamicsROS runDynamicsROS.cpp)
+  add_dependencies(runPendulumDynamicsROS ${PROJECT_NAME}_generate_messages)
+
   target_link_libraries(runPendulumDynamicsROS drakeRBM ${roscpp_LIBRARIES} ${std_msgs_LIBRARIES})
   # add_test(NAME runPendulumDynamicsROS COMMAND runPendulumDynamicsROS WORKING_DIRECTORY ${PROJECT_SOURCE_DIR}/examples/Pendulum)
 endif()

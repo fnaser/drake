@@ -1,5 +1,3 @@
-// Copyright 2016 The Drake Authors
-
 #ifndef DRAKE_SYSTEMS_PLANTS_BOTVISUALIZERROS_H_
 #define DRAKE_SYSTEMS_PLANTS_BOTVISUALIZERROS_H_
 
@@ -16,6 +14,8 @@
 #include "drake/systems/plants/RigidBodyTree.h"
 
 #include "drake/util/drakeGeometryUtil.h"
+
+#include <drake/rost_viewer_draw.h>
 
 namespace Drake {
 
