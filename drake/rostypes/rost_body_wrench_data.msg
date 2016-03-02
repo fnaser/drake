@@ -1,0 +1,12 @@
+
+
+# Original LCM
+#
+# struct lcmt_body_wrench_data
+# {
+# 	int64_t timestamp;
+#
+# 	string body_name;
+#
+# 	double wrench[6];
+# }

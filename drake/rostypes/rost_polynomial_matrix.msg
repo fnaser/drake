@@ -1,0 +1,12 @@
+# Original LCM
+#
+# struct lcmt_polynomial_matrix
+# {
+# 	int64_t timestamp;
+#
+# 	int32_t rows;
+#
+# 	int32_t cols;
+#
+# 	lcmt_polynomial polynomials[rows][cols];
+# }

@@ -1,0 +1,12 @@
+# Original LCM
+#
+# struct lcmt_force_torque
+# {
+#     int64_t  timestamp;
+#     double   fx;
+#     double   fy;
+#     double   fz;
+#     double   tx;
+#     double   ty;
+#     double   tz;
+# }

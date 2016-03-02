@@ -1,0 +1,9 @@
+# Original LCM
+#
+# struct lcmt_foot_flag
+# {
+# 	int64_t timestamp;
+#
+# 	boolean right;
+# 	boolean left;
+# }

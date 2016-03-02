@@ -1,0 +1,11 @@
+# Original LCM
+#
+# struct lcmt_driving_control_cmd_t
+# {
+#   int64_t timestamp;
+#
+#   double steering_angle; //assumed to be absolute steering angle
+#   double throttle_value;
+#   double brake_value;
+# }
+

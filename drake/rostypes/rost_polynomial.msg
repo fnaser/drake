@@ -1,0 +1,10 @@
+# Original LCM
+#
+# struct lcmt_polynomial
+# {
+# 	int64_t timestamp;
+#
+# 	int32_t num_coefficients;
+#
+# 	double coefficients[num_coefficients];
+# }

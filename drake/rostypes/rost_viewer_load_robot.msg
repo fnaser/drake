@@ -1,0 +1,7 @@
+# Original LCM
+#
+# struct lcmt_viewer_load_robot
+# {
+#   int32_t num_links;
+#   lcmt_viewer_link_data link[num_links];
+# }

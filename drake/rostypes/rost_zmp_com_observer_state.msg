@@ -1,0 +1,11 @@
+# Original LCM
+#
+# struct lcmt_zmp_com_observer_state
+# {
+#   int64_t utime;
+#
+#   double com[2];
+#   double comd[2];
+#   double ground_plane_height;
+# }
+

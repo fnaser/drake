@@ -1,0 +1,12 @@
+# Original LCM
+#
+# struct lcmt_joint_pd_override {
+# 	int64_t timestamp;
+#
+# 	int32_t position_ind;
+# 	double qi_des;
+# 	double qdi_des;
+# 	double kp;
+# 	double kd;
+# 	double weight;
+# }
