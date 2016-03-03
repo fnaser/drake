@@ -330,6 +330,7 @@ void parseLink(RigidBodyTree* model, std::string robot_name, XMLElement* node,
     parseCollision(body, collision_node, model, package_map, root_dir);
   }
 
+  std::cout << "RigidBodyTreeURDF: Added rigid body: " << *body.get() << std::endl;
   model->bodies.push_back(body);
   body->body_index = static_cast<int>(model->bodies.size()) - 1;
 }

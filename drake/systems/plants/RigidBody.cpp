@@ -111,6 +111,9 @@ bool RigidBody::CollisionElement::collidesWith(
 ostream& operator<<(ostream& out, const RigidBody& b) {
   std::string joint_name =
       b.hasParent() ? b.getJoint().getName() : "no parent joint";
-  out << "RigidBody(" << b.linkname << "," << joint_name << ")";
+  std::cout << "RigidBody(" << b.linkname << "," << joint_name << "):\n"
+      << "  - I = " << b.I << "\n"
+      << "  - COM = " << b.com << "\n"
+      << "  - mass = " << b.mass << "\n" << std::endl;
   return out;
 }
