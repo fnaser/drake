@@ -10,40 +10,40 @@
   <link name="right_wheel">
     <inertial>
       <mass value="14.28" />
-      <inertia iyy=".77843904" ixx=".49991220" izz=".49991220" />
+      <inertia iyy="0.77843904" ixx="0.49991220" izz="0.49991220" />
     </inertial>
     <visual>
       <origin xyz="0 0 0" rpy="1.5708 0 0" />
       <geometry>
-        <cylinder length=".215" radius="0.323342"/>
+        <cylinder length="0.215" radius="0.323342"/>
       </geometry>
       <material name="">
-        <color rgba=".2 .2 .2 1" />
+        <color rgba="0.2 0.2 0.2 1" />
       </material>
     </visual>
     <collision>
       <origin xyz="0 0 0" rpy="1.5708 0 0" />
       <geometry>
-        <cylinder length=".215" radius="0.323342"/>
+        <cylinder length="0.215" radius="0.323342"/>
       </geometry>
     </collision>
     <!-- Wheel Markings -->
     <visual>
       <origin xyz="0 -.1075 0" rpy="0 0 1.5708"/>
       <material>
-        <color rgba=".9 .9 .9 1"/>
+        <color rgba="0.9 0.9 0.9 1"/>
       </material>
       <geometry>
-        <box size=".0025 .0025 .25"/>
+        <box size=".0025 0.0025 0.25"/>
       </geometry>
     </visual>
     <visual>
-      <origin xyz="0 -.1075 0" rpy="0 1.5708 0"/>
+      <origin xyz="0 -0.1075 0" rpy="0 1.5708 0"/>
       <material>
-        <color rgba=".9 .9 .9 1"/>
+        <color rgba="0.9 0.9 0.9 1"/>
       </material>
       <geometry>
-        <box size=".0025 .0025 .25"/>
+        <box size="0.0025 0.0025 0.25"/>
       </geometry>
     </visual>     
   </link>
