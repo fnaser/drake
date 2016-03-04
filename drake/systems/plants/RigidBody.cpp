@@ -109,11 +109,57 @@ bool RigidBody::CollisionElement::collidesWith(
 }
 
 ostream& operator<<(ostream& out, const RigidBody& b) {
+  
+  // Get the parent joint's name (if any)
   std::string joint_name =
       b.hasParent() ? b.getJoint().getName() : "no parent joint";
-  std::cout << "RigidBody(" << b.linkname << "," << joint_name << "):\n"
-      << "  - I = " << b.I << "\n"
-      << "  - COM = " << b.com << "\n"
-      << "  - mass = " << b.mass << "\n" << std::endl;
+  
+  // Get the collision element IDs
+  std::stringstream collisionElementsStr;
+  collisionElementsStr << "[";
+  for (size_t ii = 0; ii < b.collision_element_ids.size(); ii++)
+  {
+    collisionElementsStr << b.collision_element_ids[ii];
+    if (b.collision_element_ids.size() - 1)
+      collisionElementsStr << ", ";
+  }
+  collisionElementsStr << "]";
+
+  // Get the collision element groups
+  // std::stringstream collisionElementGroupStr;
+  // collisionElementGroupStr << "[";
+  // typedef std::map<std::string, std::vector<DrakeCollision::ElementId>>::iterator it_type;
+  // for(it_type iterator = b.collision_element_groups.begin();
+  //     iterator != b.collision_element_groups.end();
+  //     iterator++)
+  // {
+  //   auto collisionGroup = iterator->first;
+  //   collisionElementGroupStr << "[";
+
+  //   for (size_t ii = 0; ii < collisionGroup.size(); ii++)
+  //   {
+  //     collisionElementsStr << b.collision_element_ids[ii];
+  //     if (b.collision_element_ids.size() - 1)
+  //       collisionElementsStr << ", ";
+  //     else
+  //       collisionElementsStr << "]";
+  //   }
+  //   // iterator->first = key
+  //   // iterator->second = value
+  //   // Repeat if you also want to iterate through the second map.
+  // }
+  // collisionElementGroupStr << "]";
+
+  std::cout << "RigidBody:\n"
+      << "  - link name = " << b.linkname << "\n"
+      << "  - model name = " << b.model_name << "\n"
+      << "  - parent joint = " << joint_name << "\n"
+      << "  - robot number = " << b.robotnum << "\n"
+      << "  - I =\n" << b.I << "\n"
+      << "  - COM = [" << b.com.transpose() << "]\n"
+      << "  - mass = " << b.mass << "\n"
+      << "  - contact points = " << b.contact_pts << "\n"
+      << "  - collision elements = " << collisionElementsStr.str()
+      << std::endl;
   return out;
 }
