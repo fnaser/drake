@@ -424,7 +424,7 @@
       </visual>
       </link>
     
-    <link name='lidar'>
+<!--     <link name='lidar'>
       <pose>2.4 0 0.52 0 0 0</pose>
       <visual name='lidar'>
         <pose>0 0 0 0 0 0</pose>
@@ -437,7 +437,6 @@
           <diffuse>1 1 1 1</diffuse>
           </material>
       </visual>
-      
       
       <sensor name="base_laser" type="ray">
         <always_on>1</always_on>
@@ -462,7 +461,7 @@
         <plugin name="laser" filename="libRayPlugin.so" />
       </sensor>
       <velocity_decay />
-</link>
+    </link> -->
 
 
     <joint name='body' type='fixed'>
@@ -471,11 +470,11 @@
      <pose>2.27 0.911395 0.218584 0 0 0</pose>
     </joint>
     
-    <joint name='lidar_joint' type='fixed'>
+<!--     <joint name='lidar_joint' type='fixed'>
       <parent>chassis_floor</parent>
       <child>lidar</child>
       <pose>0 0 0 0 0 0</pose>
-    </joint>
+    </joint> -->
     
     <joint name='chassis_floor_axle' type='fixed'>
       <parent>chassis_floor</parent>
