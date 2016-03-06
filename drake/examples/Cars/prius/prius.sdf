@@ -36,7 +36,8 @@
         <pose>0 0 0 0 0 0</pose>
         <geometry>
           <mesh>
-            <uri>/prius.dae</uri>
+            <!-- <uri>/prius.dae</uri> -->
+            <uri>/prius.obj</uri>
           </mesh>
         </geometry>
         <material>
@@ -173,7 +174,7 @@
         </geometry>
       </collision>
     </link>
-    
+
     <link name='left_wheel_rear'>
       <pose>-1.40948 0.801993 0.323342 1.5708 0 0</pose>
       <inertial>
@@ -422,7 +423,7 @@
           <diffuse>0 0 1 1</diffuse>
       </material>
       </visual>
-      </link>
+    </link>
     
 <!--     <link name='lidar'>
       <pose>2.4 0 0.52 0 0 0</pose>
@@ -467,7 +468,7 @@
     <joint name='body' type='fixed'>
       <parent>chassis_floor</parent>
       <child>body</child>
-     <pose>2.27 0.911395 0.218584 0 0 0</pose>
+      <!-- <pose>2.27 0.911395 0.218584 0 0 0</pose> -->
     </joint>
     
 <!--     <joint name='lidar_joint' type='fixed'>
@@ -479,35 +480,34 @@
     <joint name='chassis_floor_axle' type='fixed'>
       <parent>chassis_floor</parent>
       <child>front_axle</child>
-      <pose>0 0 0 0 0 0</pose>
+      <!-- <pose>0 0 0 0 0 0</pose> -->
     </joint>
-    
+
     <joint name='chassis_rear_axle' type='fixed'>
       <parent>chassis_floor</parent>
       <child>rear_axle</child>
-      <pose>0 0 0 0 0 0</pose>
+      <!-- <pose>0 0 0 0 0 0</pose> -->
     </joint>
-    
+
     <joint name='left_hub' type='fixed'>
       <parent>left_tie_rod_arm</parent>
       <child>left_hub</child>
-      <pose>0 0 0 0 0 0</pose> 
+      <!-- <pose>0 0 0 0 0 0</pose> -->
     </joint>
-    
-    
+
    <joint name='left_pin' type='revolute'>
       <parent>left_tie_rod_arm</parent>
       <child>tie_rod</child>
-      <pose>0 0.408503 0 0 0 0</pose>
+      <!-- <pose>0 0.408503 0 0 0 0</pose> -->
       <axis>
         <xyz>0 0 1</xyz>
       </axis>
     </joint>
-    
+
     <joint name='left_wheel_joint' type='revolute'>
       <parent>left_hub</parent>
       <child>left_wheel</child>
-      <pose>0 0 0 0 0 0</pose>
+      <!-- <pose>0 0 0 0 0 0</pose> -->
       <axis>
         <xyz>0 1 0</xyz>
         <use_parent_model_frame>1</use_parent_model_frame>
@@ -517,7 +517,7 @@
     <joint name='rear_left_wheel_joint' type='revolute'>
       <parent>rear_axle</parent>
       <child>left_wheel_rear</child>
-      <pose>0 0 0 0 0 0</pose>
+      <!-- <pose>0 0 0 0 0 0</pose> -->
       <axis>
         <xyz>0 1 0</xyz>
         <use_parent_model_frame>1</use_parent_model_frame>
@@ -527,7 +527,7 @@
     <joint name='rear_right_wheel_joint' type='revolute'>
       <parent>rear_axle</parent>
       <child>right_wheel_rear</child>
-      <pose>0 0 0 0 0 0</pose>
+      <!-- <pose>0 0 0 0 0 0</pose> -->
       <axis>
         <xyz>0 1 0</xyz>
         <use_parent_model_frame>1</use_parent_model_frame>
@@ -537,13 +537,13 @@
     <joint name='right_hub' type='fixed'>
       <parent>right_tie_rod_arm</parent>
       <child>right_hub</child>
-      <pose>0 0 0 0 0 0</pose>
+      <!-- <pose>0 0 0 0 0 0</pose> -->
     </joint>
     
     <joint name='right_pin' type='revolute'>
       <parent>right_tie_rod_arm</parent>
       <child>tie_rod</child>
-      <pose>0 -0.408503 0 0 0 0</pose>
+      <!-- <pose>0 -0.408503 0 0 0 0</pose> -->
       <axis>
         <xyz>0 0 1</xyz>
         <limit>
@@ -556,17 +556,17 @@
     <joint name='right_wheel_joint' type='revolute'>
       <parent>right_hub</parent>
       <child>right_wheel</child>
-      <pose>0 0 0 0 0 0</pose>
+      <!-- <pose>0 0 0 0 0 0</pose> -->
       <axis>
         <xyz>0 1 0</xyz>
        <use_parent_model_frame>1</use_parent_model_frame>
       </axis>
-    </joint>
+    </joint>-->
     
     <joint name='steering' type='revolute'>
       <parent>front_axle</parent>
       <child>left_tie_rod_arm</child>
-      <pose>.17246863 .08623431 0 0 0 0</pose>
+      <!-- <pose>.17246863 .08623431 0 0 0 0</pose> -->
       <axis>
         <xyz>0 0 1</xyz>
         <limit>
@@ -579,7 +579,7 @@
     <joint name='axle_tie_rod_arm' type='revolute'>
       <parent>front_axle</parent>
       <child>right_tie_rod_arm</child>
-      <pose>.17246863 -.08623431 0 0 0 0</pose>
+      <!-- <pose>.17246863 -.08623431 0 0 0 0</pose> -->
       <axis>
         <xyz>0 0 1</xyz>
       </axis>
