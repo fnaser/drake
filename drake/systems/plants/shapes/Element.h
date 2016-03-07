@@ -22,7 +22,8 @@ class DRAKESHAPES_EXPORT Element {
         T_element_to_local(Eigen::Isometry3d::Identity()){};
 
   Element(const Eigen::Isometry3d& T_element_to_local)
-      : geometry(), T_element_to_local(T_element_to_local){};
+      : geometry(),
+        T_element_to_local(T_element_to_local){};
 
   virtual ~Element(){};
 
@@ -31,6 +32,8 @@ class DRAKESHAPES_EXPORT Element {
   const Eigen::Isometry3d& getWorldTransform() const;
 
   const Eigen::Isometry3d& getLocalTransform() const;
+
+  void setLocalTransform(const Eigen::Isometry3d& T_element_to_local);
 
   virtual void updateWorldTransform(const Eigen::Isometry3d& T_local_to_world);
 
@@ -44,10 +47,12 @@ class DRAKESHAPES_EXPORT Element {
 
   void getTerrainContactPoints(Eigen::Matrix3Xd& points);
 
+  friend std::ostream& operator<<(std::ostream& out, const Element& e);
+
  protected:
   virtual void setWorldTransform(const Eigen::Isometry3d& T_elem_to_world);
   Eigen::Isometry3d T_element_to_world;
-  const Eigen::Isometry3d T_element_to_local;
+  Eigen::Isometry3d T_element_to_local;
   std::unique_ptr<Geometry> geometry;
 
   Element(const Element&);

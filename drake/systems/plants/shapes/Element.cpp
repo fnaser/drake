@@ -1,5 +1,7 @@
 #include "Element.h"
 
+#include <iostream>
+
 using namespace Eigen;
 
 namespace DrakeShapes {
@@ -40,6 +42,10 @@ void Element::getTerrainContactPoints(Eigen::Matrix3Xd& local_points) {
   local_points = T_element_to_local * points;
 }
 
+void Element::setLocalTransform(const Eigen::Isometry3d& T_element_to_local) {
+  this->T_element_to_local = T_element_to_local;
+}
+
 void Element::updateWorldTransform(const Eigen::Isometry3d& T_local_to_world) {
   setWorldTransform(T_local_to_world * (this->T_element_to_local));
 }
@@ -47,4 +53,13 @@ void Element::updateWorldTransform(const Eigen::Isometry3d& T_local_to_world) {
 void Element::setWorldTransform(const Isometry3d& T_element_to_world) {
   this->T_element_to_world = T_element_to_world;
 }
+
+std::ostream& operator<<(std::ostream& os, const Element& e) {
+  os << "Element:\n"
+            << " - world transform:\n" << e.getWorldTransform().matrix() << "\n"
+            << " - local transform:\n" << e.getLocalTransform().matrix()
+            << std::endl;
+  return os;
+}
+
 }

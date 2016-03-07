@@ -27,6 +27,8 @@ class DRAKESHAPES_EXPORT VisualElement : public Element {
 
   const Eigen::Vector4d& getMaterial() const;
 
+  friend std::ostream& operator<<(std::ostream& out, const VisualElement& ve);
+
  protected:
   Eigen::Vector4d material;
 

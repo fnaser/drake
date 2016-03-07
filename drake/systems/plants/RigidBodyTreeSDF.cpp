@@ -125,25 +125,30 @@ void parseSDFVisual(shared_ptr<RigidBody> body, XMLElement* node,
                     RigidBodyTree* model, const PackageMap& package_map,
                     const string& root_dir, PoseMap& pose_map,
                     const Isometry3d& transform_parent_to_model) {
+
+  const char* attr = node->Attribute("name");
+  if (!attr) throw runtime_error("ERROR: visual tag is missing name attribute");
+  const std::string visualName(attr);
+
+  // By default assume the visual's coordinate frame is the same as the link's coordinate frame
   Isometry3d transform_to_model = transform_parent_to_model;
   XMLElement* pose = node->FirstChildElement("pose");
   if (pose)
     poseValueToTransform(pose, pose_map, transform_to_model,
                          transform_parent_to_model);
 
-  /*
-    const char* attr = node->Attribute("name");
-    if (!attr) throw runtime_error("ERROR: visual tag is missing name
-    attribute");
-    string name(attr);
-  */
+  // Verify a geometry specification exists
   XMLElement* geometry_node = node->FirstChildElement("geometry");
   if (!geometry_node)
-    throw runtime_error("ERROR: Link " + body->linkname +
-                        " has a visual element without geometry.");
+    throw runtime_error("ERROR: Link " + body->linkname + " has a visual element without geometry.");
 
-  DrakeShapes::VisualElement element(transform_parent_to_model.inverse() *
-                                     transform_to_model);
+  // [link-to-model] * [model-to-visual] = [link-to-visual]
+  Isometry3d transform_element_to_local = transform_parent_to_model.inverse() * transform_to_model;
+
+
+  DrakeShapes::VisualElement element(transform_element_to_local);
+  // element.updateWorldTransform(transform_to_model);  // added by liang
+
   if (!parseSDFGeometry(geometry_node, package_map, root_dir, element))
     throw runtime_error("ERROR: Failed to parse visual element in link " +
                         body->linkname + ".");
@@ -161,6 +166,16 @@ void parseSDFVisual(shared_ptr<RigidBody> body, XMLElement* node,
     // DEBUG
     // cout << "parseVisual: Adding element to body" << endl;
     // END_DEBUG
+
+    std::cout << "RigidBodyTreeSDF.cpp: parseSDFVisual: Creating visual element:\n"
+              << " - link: " << body->linkname << "\n"
+              << " - visual: " << visualName << "\n"
+              << " - transform_parent_to_model (link-to-model):\n" << transform_parent_to_model.matrix() << "\n"
+              << " - transform_to_model: (visual-to-model)\n" << transform_to_model.matrix() << "\n"
+              << " - transform_element_to_local (visual-to-link):\n" << transform_element_to_local.matrix() << "\n"
+              << " - visual element:\n" << element
+              << std::endl;
+
     body->addVisualElement(element);
   }
 }
@@ -216,6 +231,7 @@ void parseSDFLink(RigidBodyTree* model, std::string model_name,
     throw runtime_error(
         "ERROR: do not name a link 'world', it is a reserved name");
 
+  // Get the link-to-model transform.
   Isometry3d transform_to_model = Isometry3d::Identity();
   XMLElement* pose = node->FirstChildElement("pose");
   if (pose) {
@@ -241,7 +257,21 @@ void parseSDFLink(RigidBodyTree* model, std::string model_name,
                       pose_map, transform_to_model);
   }
 
-  std::cout << "RigidBodyTreeSDF: Added rigid body: " << *body.get() << std::endl;
+  // std::cout << "RigidBodyTreeSDF.cpp: parseSDFLink: Method Called!\n"
+  //           << " - model_name = " << body->model_name << "\n"
+  //           << " - link _name = " << body->linkname << "\n"
+  //           << " - transform_to_model = \n" << transform_to_model.matrix() << "\n"
+  //           << std::endl;
+
+  std::cout << "RigidBodyTreeSDF.cpp: parseSDFLink: Added rigid body:\n"
+            << " - model_name: " << body->model_name << "\n"
+            << " - link _name: " << body->linkname << "\n"
+            << " - transform_to_model: (link-to-model) \n" << transform_to_model.matrix() << "\n"
+            << " - Details of Rigid Body:\n"
+            << "====================================\n"
+            << *body.get() << "\n"
+            << "===================================="
+            << std::endl;
   model->bodies.push_back(body);
   body->body_index = static_cast<int>(model->bodies.size()) - 1;
 }
@@ -279,18 +309,18 @@ void parseSDFJoint(RigidBodyTree* model, std::string model_name,
 
   attr = node->Attribute("name");
   if (!attr) throw runtime_error("ERROR: joint tag is missing name attribute");
-  string name(attr);
+  string joint_name(attr);
 
   attr = node->Attribute("type");
   if (!attr)
-    throw runtime_error("ERROR: joint " + name +
+    throw runtime_error("ERROR: joint " + joint_name +
                         " is missing the type attribute");
-  string type(attr);
+  string joint_type(attr);
 
   // parse parent
   string parent_name;
   if (!parseStringValue(node, "parent", parent_name))
-    throw runtime_error("ERROR: joint " + name + " doesn't have a parent node");
+    throw runtime_error("ERROR: joint " + joint_name + " doesn't have a parent node");
 
   auto parent = model->findLink(parent_name, model_name);
   if (!parent)
@@ -300,27 +330,35 @@ void parseSDFJoint(RigidBodyTree* model, std::string model_name,
   // parse child
   string child_name;
   if (!parseStringValue(node, "child", child_name))
-    throw runtime_error("ERROR: joint " + name + " doesn't have a child node");
+    throw runtime_error("ERROR: joint " + joint_name + " doesn't have a child node");
 
   auto child = model->findLink(child_name, model_name);
   if (!child)
     throw runtime_error("ERROR: could not find child link named " + child_name);
 
-  Isometry3d transform_to_model = Isometry3d::Identity(),
+  Isometry3d transform_child_to_model = Isometry3d::Identity(),
              transform_parent_to_model = Isometry3d::Identity();
+
+  // obtain the child-to-model frame transformation
   if (pose_map.find(child_name) != pose_map.end())
-    transform_to_model = pose_map.at(
-        child_name);  // by default, use the child frame as the joint frame
+    transform_child_to_model = pose_map.at(child_name);
+  
+  // obtain the parent-to-model frame transformation
   if (pose_map.find(parent_name) != pose_map.end())
     transform_parent_to_model = pose_map.at(parent_name);
 
+  Isometry3d transform_to_model = transform_child_to_model;
+
+  // obtain the joint-to-model frame. Read the pose in using the child coordinate frame by default.
   XMLElement* pose = node->FirstChildElement("pose");
   if (pose)
+  {
     poseValueToTransform(pose, pose_map, transform_to_model,
-                         transform_parent_to_model);  // read the pose in using
-                                                      // the parent coords by
-                                                      // default
-
+                         transform_child_to_model);  // read the pose in using
+                                                     // the child coordinate frame by
+                                                     // default
+  }
+  
   if (pose_map.find(child_name) == pose_map.end()) {
     pose_map.insert(pair<string, Isometry3d>(
         child_name, transform_to_model));  // this joint actually defines the
@@ -335,8 +373,8 @@ void parseSDFJoint(RigidBodyTree* model, std::string model_name,
   Vector3d axis;
   axis << 1, 0, 0;
   XMLElement* axis_node = node->FirstChildElement("axis");
-  if (axis_node && type.compare("fixed") != 0 &&
-      type.compare("floating") != 0) {
+  if (axis_node && joint_type.compare("fixed") != 0 &&
+      joint_type.compare("floating") != 0) {
     parseVectorValue(axis_node, "xyz", axis);
     if (axis.norm() < 1e-8)
       throw runtime_error("ERROR: axis is zero.  don't do that");
@@ -353,15 +391,30 @@ void parseSDFJoint(RigidBodyTree* model, std::string model_name,
   Isometry3d transform_to_parent_body =
       transform_parent_to_model.inverse() * transform_to_model;
 
+  std::cout << "RigidBodyTreeSDF.cpp: parseSDFJoint: \n"
+            << "  - joint name = " << joint_name << "\n"
+            << "  - joint type = " << joint_type << "\n"
+            << "  - parent name = " << parent_name << "\n"
+            << "  - child name = " << child_name << "\n"
+            << "  - transform_child_to_model:\n"
+            << transform_child_to_model.matrix() << "\n"
+            << "  - transform_parent_to_model:\n"
+            << transform_parent_to_model.matrix() << "\n"
+            << "  - transform_to_model:\n"
+            << transform_to_model.matrix() << "\n"
+            << "  - transform_to_parent_body:\n"
+            << transform_to_parent_body.matrix()
+            << std::endl;
+
   if (child->hasParent()) {  // then implement it as a loop joint
     Isometry3d transform_child_to_model = Isometry3d::Identity();
     if (pose_map.find(child_name) != pose_map.end())
       transform_child_to_model = pose_map.at(child_name);
     std::shared_ptr<RigidBodyFrame> frameA = allocate_shared<RigidBodyFrame>(
-        Eigen::aligned_allocator<RigidBodyFrame>(), name + "FrameA", parent,
+        Eigen::aligned_allocator<RigidBodyFrame>(), joint_name + "FrameA", parent,
         transform_to_parent_body);
     std::shared_ptr<RigidBodyFrame> frameB = allocate_shared<RigidBodyFrame>(
-        Eigen::aligned_allocator<RigidBodyFrame>(), name + "FrameB", child,
+        Eigen::aligned_allocator<RigidBodyFrame>(), joint_name + "FrameB", child,
         transform_child_to_model.inverse() * transform_to_model);
 
     model->addFrame(frameA);
@@ -369,19 +422,21 @@ void parseSDFJoint(RigidBodyTree* model, std::string model_name,
     RigidBodyLoop l(frameA, frameB, axis);
     model->loops.push_back(l);
   } else {
+    // Update the child's reference frame to be that of its joint.
+    child->applyTransformToJointFrame(transform_to_model.inverse()*transform_child_to_model);
+
     // construct the actual joint (based on it's type)
     DrakeJoint* joint = nullptr;
-
-    //    assert(transform_to_child_body.isApprox(Isometry3d::Identity()) );
+    
     // note: my tests on the fourbar pass when this is not true, but I do not
     // actually understand why...
     // I would think that this meant my inertial and geometry elements were
     // generated in the wrong coordinate frame.
     // ... the lack of documentation in the SDF format is maddening
 
-    if (type.compare("revolute") == 0 || type.compare("gearbox") == 0) {
+    if (joint_type.compare("revolute") == 0 || joint_type.compare("gearbox") == 0) {
       FixedAxisOneDoFJoint<RevoluteJoint>* fjoint =
-          new RevoluteJoint(name, transform_to_parent_body, axis);
+          new RevoluteJoint(joint_name, transform_to_parent_body, axis);
       if (axis_node) {
         setSDFDynamics(model, axis_node, fjoint);
         setSDFLimits(axis_node, fjoint);
@@ -392,7 +447,7 @@ void parseSDFJoint(RigidBodyTree* model, std::string model_name,
         if (limit_node) parseScalarValue(limit_node, "effort", effort_limit);
 
         if (effort_limit != 0.0) {
-          RigidBodyActuator actuator(name, child, 1.0, -effort_limit,
+          RigidBodyActuator actuator(joint_name, child, 1.0, -effort_limit,
                                      effort_limit);
           model->actuators.push_back(actuator);
         }
@@ -400,11 +455,11 @@ void parseSDFJoint(RigidBodyTree* model, std::string model_name,
 
       joint = fjoint;
 
-    } else if (type.compare("fixed") == 0) {
-      joint = new FixedJoint(name, transform_to_parent_body);
-    } else if (type.compare("prismatic") == 0) {
+    } else if (joint_type.compare("fixed") == 0) {
+      joint = new FixedJoint(joint_name, transform_to_parent_body);
+    } else if (joint_type.compare("prismatic") == 0) {
       FixedAxisOneDoFJoint<PrismaticJoint>* fjoint =
-          new PrismaticJoint(name, transform_to_parent_body, axis);
+          new PrismaticJoint(joint_name, transform_to_parent_body, axis);
       if (axis_node) {
         setSDFDynamics(model, axis_node, fjoint);
         setSDFLimits(axis_node, fjoint);
@@ -414,14 +469,14 @@ void parseSDFJoint(RigidBodyTree* model, std::string model_name,
       XMLElement* limit_node = axis_node->FirstChildElement("limit");
       if (limit_node) parseScalarValue(limit_node, "effort", effort_limit);
       if (effort_limit != 0.0) {
-        RigidBodyActuator actuator(name, child, 1.0, -effort_limit,
+        RigidBodyActuator actuator(joint_name, child, 1.0, -effort_limit,
                                    effort_limit);
         model->actuators.push_back(actuator);
       }
-    } else if (type.compare("floating") == 0) {
-      joint = new RollPitchYawFloatingJoint(name, transform_to_parent_body);
+    } else if (joint_type.compare("floating") == 0) {
+      joint = new RollPitchYawFloatingJoint(joint_name, transform_to_parent_body);
     } else {
-      throw runtime_error("ERROR: Unrecognized joint type: " + type);
+      throw runtime_error("ERROR: Unrecognized joint type: " + joint_type);
     }
 
     unique_ptr<DrakeJoint> joint_unique_ptr(joint);
@@ -437,6 +492,8 @@ void parseModel(RigidBodyTree* model, XMLElement* node,
                      // (actually model) coordinates instead of relative
                      // coordinates.  sigh...
 
+  // std::cout << "RigidBodyTreeSDF.cpp: parseModel: Method Called!" << std::endl;
+
   if (!node->Attribute("name"))
     throw runtime_error("Error: your model must have a name attribute");
   string model_name = node->Attribute("name");
@@ -444,6 +501,11 @@ void parseModel(RigidBodyTree* model, XMLElement* node,
   Isometry3d transform_to_world = Isometry3d::Identity();
   XMLElement* pose = node->FirstChildElement("pose");
   if (pose) poseValueToTransform(pose, pose_map, transform_to_world);
+
+  std::cout << "RigidBodyTreeSDF.cpp: parseModel:\n"
+            << " - model_name = " << model_name << "\n"
+            << " - transform_to_world:\n" << transform_to_world.matrix()
+            << std::endl;
 
   // parse link elements
   for (XMLElement* link_node = node->FirstChildElement("link"); link_node;
@@ -460,9 +522,15 @@ void parseModel(RigidBodyTree* model, XMLElement* node,
     if (model->bodies[i]->parent == nullptr) {  // attach the root nodes to the
                                                 // world with a floating base
                                                 // joint
+
+      std::cout << "RigidBodyTreeSDF.cpp: parseModel: root link found, name = " << model->bodies[i]->linkname << std::endl;
+
       has_root_node = true;
+
+      // model->bodies[0] is the world, thus make it the parent of the robot's root node
       model->bodies[i]->parent = model->bodies[0];
 
+      // get the transform of the root link to the world
       Isometry3d transform_to_model = Isometry3d::Identity();
       if (pose_map.find(model->bodies[i]->linkname) != pose_map.end())
         transform_to_model = pose_map.at(model->bodies[i]->linkname);
@@ -479,8 +547,20 @@ void parseModel(RigidBodyTree* model, XMLElement* node,
           model->bodies[i]->setJoint(move(joint));
         } break;
         case DrakeJoint::QUATERNION: {
+
+          Eigen::Isometry3d transform_to_parent_frame = transform_to_world * transform_to_model;
+
+          // Shift the root link of the robot up 1m. Useful for debugging purposes.
+          // transform_to_parent_frame = transform_to_parent_frame.translate(Eigen::Vector3d(0, 0, 1));
+
+          std::cout << "RigidBodyTreeSDF.cpp: parseModel: Adding base joint:\n"
+                    << " - transform_to_world:\n" << transform_to_world.matrix() << "\n"
+                    << " - transform_to_model:\n" << transform_to_model.matrix() << "\n"
+                    << " - transform to parent frame:\n" << transform_to_parent_frame.matrix()
+                    << std::endl;
+
           unique_ptr<DrakeJoint> joint(new QuaternionFloatingJoint(
-              "base", transform_to_world * transform_to_model));
+              "base", transform_to_parent_frame));
           model->bodies[i]->setJoint(move(joint));
         } break;
         default:

@@ -14,4 +14,13 @@ void VisualElement::setMaterial(const Eigen::Vector4d& material) {
 const Eigen::Vector4d& VisualElement::getMaterial() const {
   return this->material;
 }
+
+std::ostream& operator<<(std::ostream& os, const VisualElement& ve) {
+  os << "VisualElement:\n"
+            << " - world transform:\n" << ve.getWorldTransform().matrix() << "\n"
+            << " - local transform:\n" << ve.getLocalTransform().matrix() << "\n"
+            << " - material: " << ve.material.transpose()
+            << std::endl;
+  return os;
+}
 }

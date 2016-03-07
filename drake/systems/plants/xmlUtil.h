@@ -64,6 +64,18 @@ typedef std::map<
     std::string, Eigen::Isometry3d, std::less<std::string>,
     Eigen::aligned_allocator<std::pair<const std::string, Eigen::Isometry3d> > >
     PoseMap;
+
+/*!
+ * Converts a pose vector given in <x, y, z, r, p, y> into an
+ * Eigen::Isometry3d transform matrix.
+ *
+ * @param node The XML node containing the pose information.
+ * @param pose_map A mapping of transforms from model coordinate
+ * frame to all other coordinate frames.
+ * @param T A reference to where the resulting transform should be stored.
+ * @param T_default_frame The default frame of the pose coordinates if a
+ * frame is not specified by the XML node.
+ */
 DRAKEXMLUTIL_EXPORT void poseValueToTransform(
     tinyxml2::XMLElement* node, const PoseMap& pose_map, Eigen::Isometry3d& T,
     const Eigen::Isometry3d& T_default_frame = Eigen::Isometry3d::Identity());

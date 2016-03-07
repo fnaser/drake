@@ -2,6 +2,8 @@
 #include "RigidBody.h"
 #include <stdexcept>
 
+#include "drake/util/drakeGeometryUtil.h"
+
 using namespace std;
 using namespace Eigen;
 
@@ -69,6 +71,15 @@ bool RigidBody::appendCollisionElementIdsFromThisBody(
   return true;
 }
 
+void RigidBody::applyTransformToJointFrame(const Eigen::Isometry3d& transform_body_to_joint) {
+  I = transformSpatialInertia(transform_body_to_joint,I);
+  for (auto& v : visual_elements) {
+    v.setLocalTransform(transform_body_to_joint*v.getLocalTransform());
+  }
+  // for (auto& c : )
+}
+
+
 RigidBody::CollisionElement::CollisionElement(const CollisionElement& other)
     : DrakeCollision::Element(other), body(other.getBody()) {}
 
@@ -108,7 +119,7 @@ bool RigidBody::CollisionElement::collidesWith(
   return collides;
 }
 
-ostream& operator<<(ostream& out, const RigidBody& b) {
+ostream& operator<<(ostream& os, const RigidBody& b) {
   
   // Get the parent joint's name (if any)
   std::string joint_name =
@@ -120,10 +131,20 @@ ostream& operator<<(ostream& out, const RigidBody& b) {
   for (size_t ii = 0; ii < b.collision_element_ids.size(); ii++)
   {
     collisionElementsStr << b.collision_element_ids[ii];
-    if (b.collision_element_ids.size() - 1)
+    if (ii < b.collision_element_ids.size() - 1)
       collisionElementsStr << ", ";
   }
   collisionElementsStr << "]";
+
+  std::stringstream visualElementsStr;
+  visualElementsStr << "[";
+  for (size_t ii = 0; ii < b.visual_elements.size(); ii++)
+  {
+    visualElementsStr << b.visual_elements[ii];
+    if (ii < b.visual_elements.size() - 1)
+      visualElementsStr << ", ";
+  }
+  visualElementsStr << "]";
 
   // Get the collision element groups
   // std::stringstream collisionElementGroupStr;
@@ -150,16 +171,17 @@ ostream& operator<<(ostream& out, const RigidBody& b) {
   // }
   // collisionElementGroupStr << "]";
 
-  std::cout << "RigidBody:\n"
-      << "  - link name = " << b.linkname << "\n"
+  os << "RigidBody:\n"
       << "  - model name = " << b.model_name << "\n"
+      << "  - link name = " << b.linkname << "\n"
       << "  - parent joint = " << joint_name << "\n"
       << "  - robot number = " << b.robotnum << "\n"
       << "  - I =\n" << b.I << "\n"
       << "  - COM = [" << b.com.transpose() << "]\n"
       << "  - mass = " << b.mass << "\n"
       << "  - contact points = " << b.contact_pts << "\n"
-      << "  - collision elements = " << collisionElementsStr.str()
+      << "  - collision elements = " << collisionElementsStr.str() << "\n"
+      << "  - visualElements = " << visualElementsStr.str()
       << std::endl;
-  return out;
+  return os;
 }
