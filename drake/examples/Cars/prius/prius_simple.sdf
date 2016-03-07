@@ -2,65 +2,96 @@
 
 <sdf version='1.6'>
   <model name='prius_1'>
-    <link name='right_wheel'>
-      <pose>1.40948 -0.801993 0.323342 1.5708 0 0</pose>
+
+    <link name='chassis_floor'>
+      <pose>0 0 0.385184 0 0 0</pose> <!-- relative to the model frame -->
       <inertial>
-        <mass>14.28</mass>
+       <pose>0 0 0 0 0 0</pose>
+        <mass>57.833</mass>
         <inertia>
-          <ixx>0.499912</ixx>
+          <ixx>2.71553</ixx>
           <ixy>0</ixy>
           <ixz>0</ixz>
-          <iyy>0.778439</iyy>
+          <iyy>68.9</iyy>
           <iyz>0</iyz>
-          <izz>0.499912</izz>
+          <izz>71.6063</izz>
         </inertia>
       </inertial>
-      <visual name='m2'>
-        <pose>0 0 .1075 0 1.57079 3.14159</pose>
-        <material>
-          <diffuse>0.9 0.9 0.9 1</diffuse>
-        </material>
-        <geometry>
-          <box>
-            <size>0.0025 0.0025 0.25</size>
-          </box>
-        </geometry>
-      </visual>
-      <visual name='wheel'>
+      <visual name='main'>
         <pose>0 0 0 0 0 0</pose>
         <geometry>
-          <cylinder>
-            <length>0.215</length>
-            <radius>0.323342</radius>
-          </cylinder>
-        </geometry>
-        <material>
-          <diffuse>0.2 0.2 0.2 1</diffuse>
-        </material>
-      </visual>
-      <visual name='m1'>
-        <pose>0 0 .1075 0 1.5708 1.5708</pose>
-        <material>
-          <diffuse>0.9 0.9 0.9 1</diffuse>
-        </material>
-        <geometry>
           <box>
-            <size>0.0025 0.0025 0.25</size>
+            <size>2.8808 0.75 0.030921</size>
           </box>
         </geometry>
+        <material>
+          <diffuse>1 1 1 1</diffuse>
+        </material>
       </visual>
-      <collision name='wheel'>
-        <laser_retro>0</laser_retro>
-        <max_contacts>10</max_contacts>
-        <pose>0 0 0 0 0 0</pose>
-        <geometry>
-          <cylinder>
-            <radius>0.323342</radius>
-            <length>0.215</length>
-          </cylinder>
-        </geometry>
-      </collision>
     </link>
+
+    <link name='front_axle'>
+      <pose>1.40948 0 0.3302 0 0 0</pose> <!-- relative to the model frame -->
+      <visual name='visual'>
+        <pose>0 0 0 0 0 0</pose>
+        <geometry>
+          <box>
+            <size>0.061842 1.05132 0.030921</size>
+          </box>
+        </geometry>
+        <material>
+          <diffuse>0 0 1 1</diffuse>
+        </material>
+      </visual>
+    </link>
+
+    <link name='left_tie_rod_arm'>
+      <pose>1.23701032 0.40850253 0.299279 0 0 0</pose> <!-- relative to model frame -->
+
+      <visual name='v2'>
+        <pose>0.06385963 0.03192981 0 0 0 0.463648</pose> <!-- relative to link reference frame -->
+        <geometry>
+          <box>
+            <size>0.204637 0.061842 0.030921</size>
+          </box>
+        </geometry>
+        <material>
+          <diffuse>0 0.5 0 1</diffuse>
+        </material>
+      </visual>
+
+      <visual name='v1'>
+        <pose>0.17246863 0.10851978 0 0 -0 0</pose> <!-- relative to link reference frame -->
+        <geometry>
+          <box>
+            <size>0.061842 0.140955 0.030921</size>
+          </box>
+        </geometry>
+        <material>
+          <diffuse>1 0 0 1</diffuse>
+        </material>
+      </visual>
+    </link>
+
+    <joint name='chassis_floor_axle' type='fixed'>
+      <parent>chassis_floor</parent>
+      <child>front_axle</child>
+      <pose>0 0 0 0 0 0</pose> <!-- relative to child frame. -->
+    </joint>
+
+    <joint name='steering' type='revolute'>
+      <parent>front_axle</parent>
+      <child>left_tie_rod_arm</child>
+      <pose>0.17246863 0.08623431 0 0 0 0</pose> <!-- relative to child frame -->
+      <axis>
+        <xyz>0 0 1</xyz>
+        <limit>
+          <lower>-0.401426</lower>
+          <upper>0.5</upper>
+        </limit>
+      </axis>
+    </joint>
+
   </model>
 </sdf>
 
