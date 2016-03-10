@@ -73,21 +73,21 @@ void simulate(const System& sys, double t0, double tf,
       Eigen::VectorXd::Zero(getNumInputs(sys)));
   typename System::template OutputVector<double> y;
 
-  size_t simCycleCnt = 0;
+  // size_t simCycleCnt = 0;
   while (t < tf) {
     handle_realtime_factor(start, t, options.realtime_factor,
                            options.timeout_seconds);
     dt = (std::min)(options.initial_step_size, tf - t);
 
-    std::cout << "Drake::simulate: [" << simCycleCnt++ << "] sim time " << t <<  std::endl;
+    // std::cout << "Drake::simulate: [" << simCycleCnt++ << "] sim time " << t <<  std::endl;
 
     y = sys.output(t, x, u);
     xdot = sys.dynamics(t, x, u);
     x = toEigen(x) + dt * toEigen(xdot);
     t += dt;
 
-    std::cout << "Drake::simulate: Done with one simulation cycle. Press any key to continue." << std::endl;
-    getchar();
+    // std::cout << "Drake::simulate: Done with one simulation cycle. Press any key to continue." << std::endl;
+    // getchar();
   }
 }
 
