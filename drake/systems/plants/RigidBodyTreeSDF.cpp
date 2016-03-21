@@ -242,7 +242,13 @@ void parseSDFLink(RigidBodyTree* model, std::string model_name,
   Isometry3d transform_to_model = Isometry3d::Identity();
   XMLElement* pose = node->FirstChildElement("pose");
   if (pose) {
-    poseValueToTransform(pose, pose_map, transform_to_model);
+    bool printMsg = false;
+    // if (body->linkname.compare("left_hub") == 0) {
+    //   std::cout << "RigidBodyTreeSDF.cpp: parseSDFLink: Computing transform_to_model of link \""
+    //             << body->linkname << "\"..." << std::endl;
+    //   printMsg = true;
+    // }
+    poseValueToTransform(pose, pose_map, transform_to_model, Eigen::Isometry3d::Identity(), printMsg);
     pose_map.insert(
         std::pair<string, Isometry3d>(body->linkname, transform_to_model));
   }
@@ -405,7 +411,7 @@ void parseSDFJoint(RigidBodyTree* model, std::string model_name,
   Isometry3d transform_to_parent_body =
     transform_parent_to_model.inverse() * transform_to_model;
 
-  // if (name.compare("rear_left_wheel_joint") == 0)
+  // if (name.compare("left_wheel_joint") == 0)
   // {
   //   std::cout << "RigidBodyTreeSDF.cpp: parseSDFJoint: Computing transform_to_parent_body.\n"
   //             << "  - joint name: " << name << "\n"
